@@ -4,9 +4,9 @@
 
 ```cd api```
 
-````composer install```
+```composer install```
 
 ## Run symfony web server
 
-````symfony server:start -d```
+```symfony server:start -d```
 
