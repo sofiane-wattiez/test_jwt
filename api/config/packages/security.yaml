@@ -3,9 +3,7 @@ security:
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
-        App\Entity\User:
-            algorithm: auto
-
+        App\Entity\User: 'auto'
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
         # used to reload user from session & other features (e.g. switch_user)
@@ -13,47 +11,53 @@ security:
             entity:
                 class: App\Entity\User
                 property: email
+        jwt:
+            lexik_jwt:
+                class: App\Entity\User
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-        # registration:
-        #     pattern: ^/api/users
-        #     anonymous: true
-        #     stateless: true
-        #     methods: [POST]
-        # api:
-        #     pattern:   ^/api/
-        #     anonymous: true
-        #     stateless: true
-        #     guard:
-        #         authenticators:
-        #             - lexik_jwt_authentication.jwt_token_authenticator
-        main:
+        refresh:
+            pattern:  ^/api/token/refresh
+            stateless: true  
+        login:
+            pattern: ^/api/login$
             stateless: true
             provider: app_user_provider
-            # json_login:
-            #     check_path: /authentication_token
-            #     username_path: email
-            #     password_path: password
-            #     success_handler: lexik_jwt_authentication.handler.authentication_success
-            #     failure_handler: lexik_jwt_authentication.handler.authentication_failure
-            # jwt: ~
-
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
-
-    # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
+            json_login:
+                check_path: /api/login # or api_login_check as defined in config/routes.yaml
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+        # register:
+        # pattern:  ^/register
+        # stateless: true
+        # anonymous: true
+        api_token_refresh:
+            pattern: ^/api/token/refresh
+            stateless: true
+            refresh_jwt:
+                provider: user_provider_service_id
+        api:
+            provider: jwt
+            pattern:   ^/api
+            stateless: true
+            # guard:
+            # authenticators:
+            #     - lexik_jwt_authentication.jwt_token_authenticator
+        main:
+            json_login:
+                check_path: /authentication_token
+                username_path: email
+                password_path: password
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
     access_control:
-        # - { path: ^/docs, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
-        # - { path: ^/authentication_token, roles: PUBLIC_ACCESS }
-        # - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }
+
 when@test:
-    security:
         password_hashers:
             # By default, password hashers are resource intensive and take time. This is
             # important to generate secure password hashes. In tests however, secure hashes

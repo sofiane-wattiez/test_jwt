@@ -1,0 +1,17 @@
+gesdinet_jwt_refresh_token:
+    ttl: 2592000
+    ttl_update: true
+    firewall: api
+    token_parameter_name: refreshToken
+    single_use: true
+    cookie:
+      enabled: true
+      same_site: lax               # default value
+      path: /                      # default value
+      domain: null                 # default value
+      http_only: true              # default value
+      secure: true                 # default value
+      remove_token_from_body: true # default value
+    manager_type: orm
+    object_manager: my.specific.entity_manager.id
+    refresh_token_class: App\Entity\JwtRefreshToken

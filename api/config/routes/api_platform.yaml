@@ -2,3 +2,7 @@ api_platform:
     resource: .
     type: api_platform
     prefix: /api
+    mapping:
+        paths: 
+            - '%kernel.project_dir%/src/Entity' # default configuration for annotations
+            - '%kernel.project_dir%/config/api_platform' # yaml or xml directory configuration
